@@ -7,6 +7,9 @@
 #include <linux/stat.h>
 #include "toyfs.h"
 
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("Steven Nam D. Le, Kevin Gadek");
+MODULE_DESCRIPTION("Toy File System");
 
 /*-------------------TO-DO LIST-----------------------
 	Implement toyfs_read_directory to make ls cmd work
