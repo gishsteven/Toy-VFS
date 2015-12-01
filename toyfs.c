@@ -8,7 +8,7 @@
 #include "toyfs.h"
 
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Steven Nam D. Le, Kevin Gadek");
+MODULE_AUTHOR("Kevin Gadek, Steven Nam D. Le, David Warren,Nathan Sanders");
 MODULE_DESCRIPTION("Toy File System");
 
 /*-------------------TO-DO LIST-----------------------
