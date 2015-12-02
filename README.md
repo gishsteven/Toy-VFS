@@ -13,9 +13,9 @@ A Linux Toy File System involving the Linux Kernel Operating System.
 8. A process in user-space that stores your file and process all file system requests forwarded by the kernel module.
 
 ##Resources
-[Writing a Simple File System](http://www2.comp.ufscar.br/~helio/fs/rkfs.html)
-[Sample file system implementations] (https://github.com/psankar/simplefs)
-[Another sample file system implementation] (https://github.com/souravzzz/lab5fs)
+1. [Writing a Simple File System](http://www2.comp.ufscar.br/~helio/fs/rkfs.html)
+2. [Sample file system implementation] (https://github.com/psankar/simplefs)
+3. [Another sample file system implementation] (https://github.com/souravzzz/lab5fs)
 
 ##Instructions (so far)
 1. Run make from working directory

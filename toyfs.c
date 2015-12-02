@@ -12,31 +12,61 @@ MODULE_AUTHOR("Kevin Gadek, Steven Nam D. Le, David Warren,Nathan Sanders");
 MODULE_DESCRIPTION("Toy File System");
 
 /*-------------------TO-DO LIST-----------------------
-	Implement toyfs_read_directory to make ls cmd work
-	Create, read, write a file
-	Issues with makefile
-
+	Implement functions (open/create/read). Focus on reading from existing file?
 */
 
 //file struct defined line 912 of fs.h
 //*********************************FILE AND INODE OPERATIONS*************************
 //function to implement ls command and list contents of directory
+/*
 static int toyfs_read_directory(struct file *file, filldir_t filldir)
-{	
-	
+{
+
 }
 
+static int toyfs_create(struct inode *ino, struct dentry *den, umode_t mode)
+{
+    struct inode *inode;
+    struct super_block *sb;
+    struct toyfs_inode *toy_inode;
+    struct buffer_head *bh;
+
+    sb = ino->i_sb;
+    inode = new_inode(sb);
+    if(!inode)
+        return -1;
+
+    inode->sb = sb;
+    inode->i_op = &toyfs_inode_ops;
+    inode->i_atime = inode->i_mtime = inode->i_ctime = CURRENT_TIME;
+    inode->i_ino = 5;
+
+    //find a unique inode #
+    while(toyfs_get_inode(sb, ))
+}/
+
+int toyfs_read(struct file *file, char *buf, int len, int *pos)
+{
+    struct buffer_head *bh;
+    char *buffer;
+}
+*/
 //data structure for file_operations
 const struct file_operations toyfs_directory_operations = {
 	.owner = THIS_MODULE,
 	//.readdir = toyfs_read_directory,
 };
 
+const struct file_operations toyfs_file_operations = {
+    //.read = toyfs_read();
+};
+
+
 struct dentry *toyfs_lookup(struct inode *parent, struct dentry *child, unsigned int flags)
 {
 	return NULL;
 }
-//inode_operations data struct defined in fs.h 
+//inode_operations data struct defined in fs.h
 static struct inode_operations toyfs_inode_ops = {
 	.lookup = toyfs_lookup,
 };
@@ -44,13 +74,13 @@ static struct inode_operations toyfs_inode_ops = {
 //*********************************END FILE/INODE OPERATIONS*************************
 
 
-//a function that creates, modifies and returns an inode for requested file or directory  
+//a function that creates, modifies and returns an inode for requested file or directory
 // inode struct defined in linux/fs.h
 //umode_t and dev_t as defined in sys/types.h; typedef unsigned short umode_t and typedef __kernel_dev_t
 struct inode *toyfs_get_inode(struct super_block *sb, const struct inode *directory, umode_t mode, dev_t dev)
-{       
+{
 	struct inode *inode = new_inode(sb);
-	
+
 	if(inode){
 		//stores next available inode # into inode->i_ino
 		inode->i_ino = get_next_ino();
@@ -101,11 +131,11 @@ int toyfs_fill_superblock(struct super_block *sb, void *data, int silent)
 
 //this implementation similar to ramfs with mount_nodev() design
 static struct dentry *toyfs_mount(struct file_system_type *filesystem_type, int flags, const char *device_name, void *data)
-{	
+{
       //defined in linux/fs/super.c. mount_bdev() uses disk instead of prog memory
 	struct dentry *det = mount_bdev(filesystem_type, flags, device_name, data, 				toyfs_fill_superblock);
-	
-	//error checking the returned dentry	
+
+	//error checking the returned dentry
 	if(IS_ERR(det))
 		printk(KERN_ERR "Error mounting the toy FS");
 	else
