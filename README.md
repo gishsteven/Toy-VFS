@@ -14,11 +14,13 @@ A Linux Toy File System involving the Linux Kernel Operating System.
 
 ##Resources
 [Writing a Simple File System](http://www2.comp.ufscar.br/~helio/fs/rkfs.html)
+[Sample file system implementations] (https://github.com/psankar/simplefs)
+[Another sample file system implementation] (https://github.com/souravzzz/lab5fs)
 
 ##Instructions (so far)
-1.Run make from working directory
+1. Run make from working directory
 2. run 'insmod toyfs_mod.ko' as root user
-3. run touch image' to create empty disk image
+3. run 'touch image' to create empty disk image
 4. run 'mkdir mount' to create mount folder in directory
 5. run 'mount -o loop -t toyfs ./image ./mount' to assemble file system
 6. run 'umount ./mount' to disassemble file system
