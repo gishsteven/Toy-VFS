@@ -11,3 +11,6 @@ A Linux Toy File System involving the Linux Kernel Operating System.
 6. A linux kernel module that captures file system requests addressed to your file system and forwards them to user-space program.
 7. A communication mechanism to pass data from kernel to user and viceversa (i.e. proc file system, device under dev/ directory, netlink sockets--your choice of mechanism)
 8. A process in user-space that stores your file and process all file system requests forwarded by the kernel module.
+
+##Resources
+[Writing a Simple File System](http://www2.comp.ufscar.br/~helio/fs/rkfs.html)
