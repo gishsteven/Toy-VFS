@@ -5,16 +5,28 @@
 #include <linux/time.h>
 #include <linux/types.h>
 #include <linux/stat.h>
+#include <linux/sched.h>	//Task_struct
 #include <asm/uaccess.h>
+#include <asm/current.h>	//Process Info
+
 #include "toyfs.h"
 
+#define TOYFS_MAGIC	0x10040203
+
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Kevin Gadek, Steven Nam D. Le, David Warren,Nathan Sanders");
+MODULE_AUTHOR("Kevin Gadek");
+MODULE_AUTHOR("Steven Nam D. Le");
+MODULE_AUTHOR("David Warren");
+MODULE_AUTHOR("Nathan Sanders");
 MODULE_DESCRIPTION("Toy File System");
 
-/*-------------------TO-DO LIST-----------------------
-	Implement functions (open/create/read). Focus on reading from existing file?
-*/
+
+/*=======================================================
+To-Do List
+=========================================================
+- Implement Functionality
+	- Read | Write | Create
+=========================================================*/
 
 //file struct defined line 912 of fs.h
 //*********************************FILE AND INODE OPERATIONS*************************
@@ -106,13 +118,25 @@ struct inode *toyfs_get_inode(struct super_block *sb, const struct inode *direct
 	//returns inode object
 	return inode;
 }
-//fills superblock with filesystem metadata, creates 'root directory'
-int toyfs_fill_superblock(struct super_block *sb, void *data, int silent)
+
+
+
+
+/*=======================================================
+Super Block
+=========================================================
+	- toy_fs_fill_superblock
+	- Edit: Add Inode Allocation
+=========================================================*/
+
+static int toyfs_fill_superblock(struct super_block *sb, void *data, int silent)
 {
-	struct inode *inode;
+	struct inode *inode = NULL;
+	printk(KERN_INFO "toyfs_fill_superblock\n");
+	
 
 	//identifer for the filesystem type
-	sb->s_magic = 0x10040203;
+	sb->s_magic = TOYFS_MAGIC;
 	inode = toyfs_get_inode(sb, NULL, S_IFDIR, 0);
 	//inode operations table
 	inode->i_op = &toyfs_inode_ops;
@@ -122,34 +146,46 @@ int toyfs_fill_superblock(struct super_block *sb, void *data, int silent)
 	sb->s_root = d_make_root(inode);
 	//error checking
 	if(!sb->s_root)
+	{	
+		printk(KERN_ERR "Root Creation has Failed\n");
 		return -ENOMEM; //not enough memory
-
+	}
 	return 0;
 }
 
+/*=====================================================
+File System Types
+=======================================================
+- dentry *toyfs_mount
+	- Defined in linux/fs/super.c
+	- mount_bdev() uses disk instead of prog memory
+- toyfs_kill_superblock
+- file_system_type
+	- Definitions
+======================================================*/
 //this implementation similar to ramfs with mount_nodev() design
 static struct dentry *toyfs_mount(struct file_system_type *filesystem_type, int flags, const char *device_name, void *data)
 {
-      //defined in linux/fs/super.c. mount_bdev() uses disk instead of prog memory
-	struct dentry *det = mount_bdev(filesystem_type, flags, device_name, data, 				toyfs_fill_superblock);
+	struct dentry *det = mount_bdev(filesystem_type, flags, device_name, data, 				toyfs_fill_superblock);	
+	printk(KERN_INFO "Initializing: toyfs_mount \n");
 
-	//error checking the returned dentry
+	
 	if(IS_ERR(det))
-		printk(KERN_ERR "Error mounting the toy FS");
+		printk(KERN_ERR "Error Mounting Toy File System\n");
 	else
-		printk(KERN_INFO "TOY FS is now mounted.");
+		printk(KERN_INFO "File System Sucessfully Mounted!");
 
 	return det;
 }
-//nothing atm
+
 static void toyfs_kill_superblock(struct super_block *sb)
 {
+	printk(KERN_INFO "Intializing: toyfs_kill_superblock\n");
 	kill_block_super(sb);
 	return;
 
 }
 
-//data structure definitions
 struct file_system_type toyfs = {
 	.owner = THIS_MODULE,
 	.name = "toyfs",
@@ -157,26 +193,24 @@ struct file_system_type toyfs = {
 	.kill_sb = toyfs_kill_superblock,
 };
 
-//functions called when module loaded and unloaded respectively
-static int toyfs_init(void) {
- int check = register_filesystem(&toyfs);
- if(check == 0)
-        printk(KERN_INFO "FS successfully registered\n");
- else
-        printk(KERN_ERR "Failed to register FS. Error: [%d]", check);
+/*=======================================================
+Register / Unregister
+=========================================================
+- toyfs_init
+- toyfs_cleanup
+========================================================*/
 
-return check;
+static int toyfs_init(void) {
+	printk(KERN_INFO "Registering File System | Loading Module\n"); 
+	printk(KERN_INFO "Userspace Process:'%s'\n", current->comm); 
+	printk(KERN_INFO "Userspace PID:'%s'\n", current->pid); 
+	return register_filesystem(&toyfs);
 }
 
 static void toyfs_cleanup(void) {
-  int check = unregister_filesystem(&toyfs);
-  if(check == 0)
-        printk(KERN_INFO "FS successfully unregistered\n");
-  else
-        printk(KERN_ERR "Failed to unregister FS. Error: [%d]", check);
+  printk(KERN_INFO "Unregistering File System | Unloading Module\n");
+  unregister_filesystem(&toyfs);
 }
 
 module_init(toyfs_init);
 module_exit(toyfs_cleanup);
-
-
