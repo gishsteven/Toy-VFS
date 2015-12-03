@@ -27,4 +27,4 @@ A Linux Toy File System involving the Linux Kernel Operating System.
 6. run 'mount -o loop -t toyfs ./image ./mount' to assemble file system
 7. run 'umount ./mount' to disassemble file system
 8. run 'rmmod toyfs_mod' to unload module 
-
+9. run 'modinfo toyfs_mod.ko' to view module info
