@@ -5,6 +5,7 @@
 #include <linux/time.h>
 #include <linux/types.h>
 #include <linux/stat.h>
+#include <asm/uaccess.h>
 #include "toyfs.h"
 
 MODULE_LICENSE("GPL");
@@ -18,14 +19,27 @@ MODULE_DESCRIPTION("Toy File System");
 //file struct defined line 912 of fs.h
 //*********************************FILE AND INODE OPERATIONS*************************
 //function to implement ls command and list contents of directory
-/*
 
-static int toyfs_read(struct file *file, char *buf, int len, int *pos)
+
+static int toyfs_read(struct file *file, char *buf, int len, int *offset)
 {
-    struct buffer_head *bh;
-    char *buffer;
+    char *buffer[100];
+    int length = 3;
+    buffer[0] = (char)file->private_data;
+    buffer[1] = '\n';
+    buffer[2] = '\0';
+    if(*offset > length)
+        return 0;
+        if(len > length - *offset)
+            len = length - *offset;
+    //int copy_to_user(void *dst, const void *src, unsigned int size);
+    if(copy_to_user(buf, buffer + *offset, len))
+            return -1;
+    *offset += len;
+    return len;
+
 }
-*/
+
 //data structure for file_operations
 const struct file_operations toyfs_directory_operations = {
 	.owner = THIS_MODULE,
@@ -33,9 +47,8 @@ const struct file_operations toyfs_directory_operations = {
 };
 
 const struct file_operations toyfs_file_operations = {
-    //.read = toyfs_read();
+    .read = toyfs_read;
 };
-
 
 struct dentry *toyfs_lookup(struct inode *parent, struct dentry *child, unsigned int flags)
 {
