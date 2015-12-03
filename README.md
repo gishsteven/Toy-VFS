@@ -21,10 +21,11 @@ A Linux Toy File System involving the Linux Kernel Operating System.
 ##Instructions (so far)
 1. Run make from working directory
 2. run 'insmod toyfs_mod.ko' as root user
-3. run 'cat /proc/filesystems' to see if filesystem is successfully registered 
+3. run 'cat /proc/filesystems | tail -1' to see if filesystem is successfully registered 
 4. run 'touch image' to create empty disk image
-5. run 'mkdir mount' to create mount folder in directory
-6. run 'mount -o loop -t toyfs ./image ./mount' to assemble file system
-7. run 'umount ./mount' to disassemble file system
+5. run 'mkdir dir' to create mount folder in directory
+6. run 'mount -o loop -t toyfs ./image ./dir' to assemble file system
+7. run 'dmesg | tail -10' to view printk messages. Change tail as necessary
+7. run 'umount ./dir' to disassemble file system
 8. run 'rmmod toyfs_mod' to unload module 
 9. run 'modinfo toyfs_mod.ko' to view module info
