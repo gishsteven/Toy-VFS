@@ -19,11 +19,6 @@ MODULE_DESCRIPTION("Toy File System");
 //*********************************FILE AND INODE OPERATIONS*************************
 //function to implement ls command and list contents of directory
 /*
-static int toyfs_read_directory(struct file *file, filldir_t filldir)
-{
-
-}
-
 
 static int toyfs_read(struct file *file, char *buf, int len, int *pos)
 {
@@ -92,7 +87,7 @@ struct inode *toyfs_get_inode(struct super_block *sb, const struct inode *direct
 	//returns inode object
 	return inode;
 }
-//fills superblock with filesystem metadata
+//fills superblock with filesystem metadata, creates 'root directory'
 int toyfs_fill_superblock(struct super_block *sb, void *data, int silent)
 {
 	struct inode *inode;
