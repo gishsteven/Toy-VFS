@@ -10,22 +10,37 @@ A Linux Toy File System involving the Linux Kernel Operating System.
 5. You must maintain basic metadata for your files.
 6. A linux kernel module that captures file system requests addressed to your file system and forwards them to user-space program.
 7. A communication mechanism to pass data from kernel to user and viceversa (i.e. proc file system, device under dev/ directory, netlink sockets--your choice of mechanism)
-8. A process in user-space that stores your file and process all file system requests forwarded by the kernel module.
+8. :white_check_mark: A process in user-space that stores your file and process all file system requests forwarded by the kernel module.
 
 ##Resources
-1. [Writing a Simple File System](http://www2.comp.ufscar.br/~helio/fs/rkfs.html)
-2. [Sample file system implementation] (https://github.com/psankar/simplefs)
-3. [Another sample file system implementation] (https://github.com/souravzzz/lab5fs)
-4. [Instructions to mount] (http://kukuruku.co/hub/nix/writing-a-file-system-in-linux-kernel)
+#### Documents
+- [Linux Cross Reference](http://lxr.free-electrons.com/source/?v=3.19)
+- [Linux Kernel Module Programming Guide](http://linux.die.net/lkmpg/x769.html)
+- [Brouwer, The Linux Kernel](https://www.win.tue.nl/~aeb/linux/lk/lk-8.html)
 
-##Instructions (so far)
-1. Run make from working directory
-2. run 'insmod toyfs_mod.ko' as root user
-3. run 'cat /proc/filesystems | tail -1' to see if filesystem is successfully registered 
-4. run 'touch image' to create empty disk image
-5. run 'mkdir dir' to create mount folder in directory
-6. run 'mount -o loop -t toyfs ./image ./dir' to assemble file system
-7. run 'dmesg | tail -10' to view printk messages. Change tail as necessary
-7. run 'umount ./dir' to disassemble file system
-8. run 'rmmod toyfs_mod' to unload module 
-9. run 'modinfo toyfs_mod.ko' to view module info
+#### Readings/Tutorials
+- [Writing A File System in Linux Kernel](http://kukuruku.co/hub/nix/writing-a-file-system-in-linux-kernel)
+- [rkfs, Writing a Simple Filesystem](http://www2.comp.ufscar.br/~helio/fs/rkfs.html)
+- [Kernel 3.19 Filesystem Documentation](http://lxr.free-electrons.com/source/Documentation/filesystems/vfs.txt?v=3.19)
+
+#### Examples/References
+- [simplefs](https://github.com/psankar/simplefs)
+- [lab5fs](https://github.com/souravzzz/lab5fs)
+
+
+##Compiling Instructions
+ |Commands | Notes
+ ---|---|---
+1.  |$ make                                       |[Run from local file]
+2.  |$ sudo insmod toyfs_mod.ko                   |[Insert Module]   
+3.  |$ dmesg \| tail -5                            |[Check for printk commands 'Successful']
+4.  |$ cat /proc/filesystems \| grep toyfs         |[Check if 'toyfs' is registered        ]
+5.  |$ touch image                                |[Create an empty 'Disk Image']
+6.  |$ mkdir dir                                  |[Create the Mount Folder in Directory]        
+7.  |$ sudo mount -o loop -t toyfs ./image ./dir  |[Assemble File System]
+8.  |$ dmesg \| tail -10                           |[Change tail as necessary]
+9.  |$ modinfo toyfs_mod.ko                       |[View module information]
+10. |$ sudo umount ./dir                          |[Unmount File System]
+11. |$ sudo rmmod toyfs_mod                       |[Remove Module]
+12. |$ dmesg                                      |[Check if Unregistered and Unounted]
+
