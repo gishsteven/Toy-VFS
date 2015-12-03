@@ -24,28 +24,8 @@ static int toyfs_read_directory(struct file *file, filldir_t filldir)
 
 }
 
-static int toyfs_create(struct inode *ino, struct dentry *den, umode_t mode)
-{
-    struct inode *inode;
-    struct super_block *sb;
-    struct toyfs_inode *toy_inode;
-    struct buffer_head *bh;
 
-    sb = ino->i_sb;
-    inode = new_inode(sb);
-    if(!inode)
-        return -1;
-
-    inode->sb = sb;
-    inode->i_op = &toyfs_inode_ops;
-    inode->i_atime = inode->i_mtime = inode->i_ctime = CURRENT_TIME;
-    inode->i_ino = 5;
-
-    //find a unique inode #
-    while(toyfs_get_inode(sb, ))
-}/
-
-int toyfs_read(struct file *file, char *buf, int len, int *pos)
+static int toyfs_read(struct file *file, char *buf, int len, int *pos)
 {
     struct buffer_head *bh;
     char *buffer;
@@ -74,7 +54,7 @@ static struct inode_operations toyfs_inode_ops = {
 //*********************************END FILE/INODE OPERATIONS*************************
 
 
-//a function that creates, modifies and returns an inode for requested file or directory
+//a function that returns an inode
 // inode struct defined in linux/fs.h
 //umode_t and dev_t as defined in sys/types.h; typedef unsigned short umode_t and typedef __kernel_dev_t
 struct inode *toyfs_get_inode(struct super_block *sb, const struct inode *directory, umode_t mode, dev_t dev)
@@ -86,26 +66,30 @@ struct inode *toyfs_get_inode(struct super_block *sb, const struct inode *direct
 		inode->i_ino = get_next_ino();
 		//sets permissions etc
 		inode_init_owner(inode, directory, mode);
+		inode->i_blocks = 10;
 		inode->i_atime = inode->i_mtime = inode->i_ctime = CURRENT_TIME;
 		//bitwise AND between mode and S_IFMT can extract the file type code from a mode value. That new value should then be compared to the following cases.
    		switch(mode & S_IFMT) {
 			//S_IFDIR = file type const of a directory file
 			case S_IFDIR:
 				//inc_nlink() defined in linux/fs/inode.c; checks if # of links that the inode contains is 0. If not, # of links is incremented by 1.
+                    inode->i_op = &toyfs_inode_ops; //use inode operations
+                    inode->i_fop = &toyfs_directory_operations; //simple directory operations
 			     	inc_nlink(inode);
 			     	break;
 			//S_IFREG = non-zero if file is a regular file
 			case S_IFREG:
+                    inode->i_op = &toyfs_inode_ops;
+                    inode->i_fop = &toyfs_file_operations;
 			//S_ISLNK = non-zero if file is symbolic link
-			//case S_ISLNK:
-			default: printk(KERN_ERR "Inode can only be made for root directory\n");
+			default: printk(KERN_ERR "Not dir or reg file.\n");
 				return 0;
 				break;
 		} //end switch
 
 	} // end if
 
-	//returns newly created/modified inode object
+	//returns inode object
 	return inode;
 }
 //fills superblock with filesystem metadata
