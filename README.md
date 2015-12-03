@@ -29,16 +29,18 @@ A Linux Toy File System involving the Linux Kernel Operating System.
 
 
 ##Compiling Instructions
-1.  $ make                                       [Run from local file]
-2.  $ sudo insmod toyfs_mod.ko                   [Insert Module]   
-3.  $ dmesg | tail -5                            [Check for printk commands 'Successful']
-4.  $ cat /proc/filesystems | grep toyfs         [Check if 'toyfs' is registered        ]
-5.  $ touch image                                [Create an empty 'Disk Image']
-6.  $ mkdir dir                                  [Create the Mount Folder in Directory]        
-7.  $ sudo mount -o loop -t toyfs ./image ./dir  [Assemble File System]
-8.  $ dmesg | tail -10                           [Change tail as necessary]
-9.  $ modinfo toyfs_mod.ko                       [View module information]
-10. $ sudo umount ./dir                          [Unmount File System]
-11. $ sudo rmmod toyfs_mod                       [Remove Module]
-12. $ dmesg                                      [Check if Unregistered and Unounted]
+ |Commands | Notes
+ ---|---|---
+1.  |$ make                                       |[Run from local file]
+2.  |$ sudo insmod toyfs_mod.ko                   |[Insert Module]   
+3.  |$ dmesg | tail -5                            |[Check for printk commands 'Successful']
+4.  |$ cat /proc/filesystems | grep toyfs         |[Check if 'toyfs' is registered        ]
+5.  |$ touch image                                |[Create an empty 'Disk Image']
+6.  |$ mkdir dir                                  |[Create the Mount Folder in Directory]        
+7.  |$ sudo mount -o loop -t toyfs ./image ./dir  |[Assemble File System]
+8.  |$ dmesg | tail -10                           |[Change tail as necessary]
+9.  |$ modinfo toyfs_mod.ko                       |[View module information]
+10. |$ sudo umount ./dir                          |[Unmount File System]
+11. |$ sudo rmmod toyfs_mod                       |[Remove Module]
+12. |$ dmesg                                      |[Check if Unregistered and Unounted]
 
