@@ -16,6 +16,7 @@ A Linux Toy File System involving the Linux Kernel Operating System.
 1. [Writing a Simple File System](http://www2.comp.ufscar.br/~helio/fs/rkfs.html)
 2. [Sample file system implementation] (https://github.com/psankar/simplefs)
 3. [Another sample file system implementation] (https://github.com/souravzzz/lab5fs)
+4. [Instructions to mount] (http://kukuruku.co/hub/nix/writing-a-file-system-in-linux-kernel)
 
 ##Instructions (so far)
 1. Run make from working directory
