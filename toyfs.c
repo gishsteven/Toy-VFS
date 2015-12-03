@@ -20,6 +20,8 @@ MODULE_DESCRIPTION("Toy File System");
 //*********************************FILE AND INODE OPERATIONS*************************
 //function to implement ls command and list contents of directory
 
+/*
+Doesn't work. 
 
 static int toyfs_read(struct file *file, char *buf, int len, int *offset)
 {
@@ -39,16 +41,20 @@ static int toyfs_read(struct file *file, char *buf, int len, int *offset)
     return len;
 
 }
+*/
 
 //data structure for file_operations
+/*
 const struct file_operations toyfs_directory_operations = {
 	.owner = THIS_MODULE,
 	//.readdir = toyfs_read_directory,
 };
-
+*/
+/*
 const struct file_operations toyfs_file_operations = {
-    .read = toyfs_read;
+    .read = toyfs_read,
 };
+*/
 
 struct dentry *toyfs_lookup(struct inode *parent, struct dentry *child, unsigned int flags)
 {
@@ -82,13 +88,13 @@ struct inode *toyfs_get_inode(struct super_block *sb, const struct inode *direct
 			case S_IFDIR:
 				//inc_nlink() defined in linux/fs/inode.c; checks if # of links that the inode contains is 0. If not, # of links is incremented by 1.
                     inode->i_op = &toyfs_inode_ops; //use inode operations
-                    inode->i_fop = &toyfs_directory_operations; //simple directory operations
+                    //inode->i_fop = &toyfs_directory_operations; //simple directory operations
 			     	inc_nlink(inode);
 			     	break;
 			//S_IFREG = non-zero if file is a regular file
 			case S_IFREG:
                     inode->i_op = &toyfs_inode_ops;
-                    inode->i_fop = &toyfs_file_operations;
+                    //inode->i_fop = &toyfs_file_operations;
 			//S_ISLNK = non-zero if file is symbolic link
 			default: printk(KERN_ERR "Not dir or reg file.\n");
 				return 0;
@@ -111,7 +117,7 @@ int toyfs_fill_superblock(struct super_block *sb, void *data, int silent)
 	//inode operations table
 	inode->i_op = &toyfs_inode_ops;
 	//file operations table
-	inode->i_fop = &toyfs_directory_operations;
+	//inode->i_fop = &toyfs_directory_operations;
 	//creates root inode for superblock ; root directory
 	sb->s_root = d_make_root(inode);
 	//error checking
@@ -158,6 +164,8 @@ static int toyfs_init(void) {
         printk(KERN_INFO "FS successfully registered\n");
  else
         printk(KERN_ERR "Failed to register FS. Error: [%d]", check);
+
+return check;
 }
 
 static void toyfs_cleanup(void) {
