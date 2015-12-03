@@ -1,3 +1,4 @@
+// Standard kernel headers
 #include <linux/init.h>
 #include <linux/kernel.h>
 #include <linux/module.h>
@@ -8,7 +9,10 @@
 #include <linux/sched.h>	//Task_struct
 #include <asm/uaccess.h>
 #include <asm/current.h>	//Process Info
-
+// For procfs communication
+#include <linux/proc_fs.h>
+#include <linux/seq_file.h>
+// User defined includes
 #include "toyfs.h"
 
 #define TOYFS_MAGIC	0x10040203
@@ -193,6 +197,23 @@ struct file_system_type toyfs = {
 	.kill_sb = toyfs_kill_superblock,
 };
 
+static int toyfs_proc_show(struct seq_file *m, void *v) {
+  seq_printf(m, "Hello from toyfs+proc!\n");
+  return 0;
+}
+
+static int toyfs_proc_open(struct inode *inode, struct  file *file) {
+  return single_open(file, toyfs_proc_show, NULL);
+}
+
+static const struct file_operations toyfs_proc_fops = {
+  .owner = THIS_MODULE,
+  .open = toyfs_proc_open,
+  .read = seq_read,
+  .llseek = seq_lseek,
+  .release = single_release,
+};
+
 /*=======================================================
 Register / Unregister
 =========================================================
@@ -204,12 +225,20 @@ static int toyfs_init(void) {
 	printk(KERN_INFO "Registering File System | Loading Module\n"); 
 	printk(KERN_INFO "Userspace Process:'%s'\n", current->comm); 
 	printk(KERN_INFO "Userspace PID:'%d'\n", current->pid); 
+
+	// Create a procfs file for communication
+	proc_create("toyfs_proc", 0666, NULL, &toyfs_proc_fops);
+
+
 	return register_filesystem(&toyfs);
 }
 
 static void toyfs_cleanup(void) {
-  printk(KERN_INFO "Unregistering File System | Unloading Module\n");
-  unregister_filesystem(&toyfs);
+ 	printk(KERN_INFO "Unregistering File System | Unloading Module\n");
+ 	// Remove the procfs file
+ 	remove_proc_entry("toyfs_proc", NULL);
+
+ 	unregister_filesystem(&toyfs);
 }
 
 module_init(toyfs_init);
