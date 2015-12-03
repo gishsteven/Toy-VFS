@@ -17,10 +17,11 @@ A Linux Toy File System involving the Linux Kernel Operating System.
 - [Linux Cross Reference](http://lxr.free-electrons.com/source/?v=3.19)
 - [Linux Kernel Module Programming Guide](http://linux.die.net/lkmpg/x769.html)
 - [Brouwer, The Linux Kernel](https://www.win.tue.nl/~aeb/linux/lk/lk-8.html)
+
 #### Readings/Tutorials
 - [Writing A File System in Linux Kernel](http://kukuruku.co/hub/nix/writing-a-file-system-in-linux-kernel)
 - [rkfs, Writing a Simple Filesystem](http://www2.comp.ufscar.br/~helio/fs/rkfs.html)
-- [vfs](http://lxr.free-electrons.com/source/Documentation/filesystems/vfs.txt?v=3.19)
+- [Kernel 3.19 Filesystem Documentation](http://lxr.free-electrons.com/source/Documentation/filesystems/vfs.txt?v=3.19)
 
 #### Examples/References
 - [simplefs](https://github.com/psankar/simplefs)
