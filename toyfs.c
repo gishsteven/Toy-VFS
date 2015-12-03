@@ -1,19 +1,16 @@
-// Standard kernel headers
-#include <linux/init.h>
+#include <linux/init.h>								// Standard kernel headers
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/fs.h>
 #include <linux/time.h>
 #include <linux/types.h>
 #include <linux/stat.h>
-#include <linux/sched.h>	//Task_struct
+#include <linux/sched.h>							//Task_struct
 #include <asm/uaccess.h>
-#include <asm/current.h>	//Process Info
-// For procfs communication
-#include <linux/proc_fs.h>
+#include <asm/current.h>							//Process Info
+#include <linux/proc_fs.h>							// For procfs communication Kernel-To-User
 #include <linux/seq_file.h>
-// User defined includes
-#include "toyfs.h"
+#include "toyfs.h"								// User defined includes
 
 #define TOYFS_MAGIC	0x10040203
 
@@ -24,17 +21,14 @@ MODULE_AUTHOR("David Warren");
 MODULE_AUTHOR("Nathan Sanders");
 MODULE_DESCRIPTION("Toy File System");
 
-
 /*=======================================================
-To-Do List
+File Operations (Non-Functional)
 =========================================================
-- Implement Functionality
-	- Read | Write | Create
+- file_operations (Data structure for file operations)
+	- .readdr
+- toyfs_read
+	- 
 =========================================================*/
-
-//file struct defined line 912 of fs.h
-//*********************************FILE AND INODE OPERATIONS*************************
-//function to implement ls command and list contents of directory
 
 /*
 Doesn't work. 
@@ -59,7 +53,7 @@ static int toyfs_read(struct file *file, char *buf, int len, int *offset)
 }
 */
 
-//data structure for file_operations
+
 /*
 const struct file_operations toyfs_directory_operations = {
 	.owner = THIS_MODULE,
@@ -72,59 +66,49 @@ const struct file_operations toyfs_file_operations = {
 };
 */
 
-struct dentry *toyfs_lookup(struct inode *parent, struct dentry *child, unsigned int flags)
-{
+
+/*=======================================================
+Inode Operations
+=========================================================
+- toyfs_get_inode
+	- Function should return an inode.
+- inode_operations
+	- .lookup
+=========================================================*/
+struct dentry *toyfs_lookup(struct inode *parent, struct dentry *child, unsigned int flags){
 	return NULL;
 }
-//inode_operations data struct defined in fs.h
-static struct inode_operations toyfs_inode_ops = {
+
+static struct inode_operations toyfs_inode_ops = {				//inode_operations data struct defined in fs.h
 	.lookup = toyfs_lookup,
 };
 
-//*********************************END FILE/INODE OPERATIONS*************************
-
-
-//a function that returns an inode
-// inode struct defined in linux/fs.h
-//umode_t and dev_t as defined in sys/types.h; typedef unsigned short umode_t and typedef __kernel_dev_t
 struct inode *toyfs_get_inode(struct super_block *sb, const struct inode *directory, umode_t mode, dev_t dev)
 {
 	struct inode *inode = new_inode(sb);
-
+	printk(KERN_INFO "Initializing: toyfs_get_inode\n");
 	if(inode){
-		//stores next available inode # into inode->i_ino
-		inode->i_ino = get_next_ino();
-		//sets permissions etc
-		inode_init_owner(inode, directory, mode);
+		inode->i_ino = get_next_ino();					//stores next available inode # into inode->i_ino
+		inode_init_owner(inode, directory, mode);			//sets permissions etc
 		inode->i_blocks = 10;
 		inode->i_atime = inode->i_mtime = inode->i_ctime = CURRENT_TIME;
-		//bitwise AND between mode and S_IFMT can extract the file type code from a mode value. That new value should then be compared to the following cases.
-   		switch(mode & S_IFMT) {
-			//S_IFDIR = file type const of a directory file
-			case S_IFDIR:
-				//inc_nlink() defined in linux/fs/inode.c; checks if # of links that the inode contains is 0. If not, # of links is incremented by 1.
-                    inode->i_op = &toyfs_inode_ops; //use inode operations
-                    //inode->i_fop = &toyfs_directory_operations; //simple directory operations
+   		switch(mode & S_IFMT) {						//bitwise AND between mode and S_IFMT can extract the file type code from a mode value. That new value should then be compared to the following cases.										
+			case S_IFDIR:						//S_IFDIR = file type const of a directory file
+                    		inode->i_op = &toyfs_inode_ops; 		//Inode operations
+                    		//inode->i_fop = &toyfs_directory_operations; 	//simple directory operations
 			     	inc_nlink(inode);
 			     	break;
-			//S_IFREG = non-zero if file is a regular file
-			case S_IFREG:
-                    inode->i_op = &toyfs_inode_ops;
-                    //inode->i_fop = &toyfs_file_operations;
-			//S_ISLNK = non-zero if file is symbolic link
-			default: printk(KERN_ERR "Not dir or reg file.\n");
+			case S_IFREG:						//S_IFREG = non-zero if file is a regular file
+                   		 inode->i_op = &toyfs_inode_ops;
+                   		 //inode->i_fop = &toyfs_file_operations;
+										//S_ISLNK = non-zero if file is symbolic link (Non-Fuctional)
+			default: printk(KERN_ERR "Not DIR or REG file.\n");
 				return 0;
 				break;
-		} //end switch
-
-	} // end if
-
-	//returns inode object
+		} 
+	} 
 	return inode;
 }
-
-
-
 
 /*=======================================================
 Super Block
@@ -138,25 +122,19 @@ static int toyfs_fill_superblock(struct super_block *sb, void *data, int silent)
 	struct inode *inode = NULL;
 	printk(KERN_INFO "Initializing: toyfs_fill_superblock\n");
 	
-
-	//identifer for the filesystem type
-	sb->s_magic = TOYFS_MAGIC;
+	sb->s_magic = TOYFS_MAGIC;						//identifer for the filesystem type
 	inode = toyfs_get_inode(sb, NULL, S_IFDIR, 0);
-	//inode operations table
-	inode->i_op = &toyfs_inode_ops;
-	//file operations table
-	//inode->i_fop = &toyfs_directory_operations;
-	//creates root inode for superblock ; root directory
-	sb->s_root = d_make_root(inode);
-	//error checking
+	inode->i_op = &toyfs_inode_ops;						//inode operations table
+	//inode->i_fop = &toyfs_directory_operations;				//file operations table
+	sb->s_root = d_make_root(inode);					//creates root inode for superblock ; root directory
+
 	if(!sb->s_root)
 	{	
 		printk(KERN_ERR "Root Creation has Failed\n");
-		return -ENOMEM; //not enough memory
+		return -ENOMEM; 
 	}
 	return 0;
 }
-
 /*=====================================================
 File System Types
 =======================================================
@@ -166,28 +144,38 @@ File System Types
 - toyfs_kill_superblock
 - file_system_type
 	- Definitions
+- toyfs_proc_fops
+	- toyfs_proc_show | toyfs_proc_open
+		- /proc filesystem
 ======================================================*/
-//this implementation similar to ramfs with mount_nodev() design
+
+static int toyfs_proc_show(struct seq_file *m, void *v) {
+  	seq_printf(m, "Hello from toyfs+proc!\n");
+  	return 0;
+}
+
+static int toyfs_proc_open(struct inode *inode, struct  file *file) {
+	printk(KERN_INFO "Initializing: toyfs_proc_open\n");
+	printk(KERN_INFO "Test        :$cat /proc/toyfs_proc\n");
+  	return single_open(file, toyfs_proc_show, NULL);
+}
+
 static struct dentry *toyfs_mount(struct file_system_type *filesystem_type, int flags, const char *device_name, void *data)
 {
-	struct dentry *det = mount_bdev(filesystem_type, flags, device_name, data, 				toyfs_fill_superblock);	
-	printk(KERN_INFO "Initializing: toyfs_mount \n");
+	struct dentry *det = mount_bdev(filesystem_type, flags, device_name, data, toyfs_fill_superblock);	
 
-	
 	if(IS_ERR(det))
 		printk(KERN_ERR "Error Mounting Toy File System\n");
 	else
-		printk(KERN_INFO "File System Sucessfully Mounted!");
-
+		printk(KERN_INFO "Initializing: toyfs_mount \n");
 	return det;
 }
 
 static void toyfs_kill_superblock(struct super_block *sb)
 {
-	printk(KERN_INFO "Intializing: toyfs_kill_superblock\n");
+	printk(KERN_INFO "Initializing: toyfs_kill_superblock\n");
 	kill_block_super(sb);
 	return;
-
 }
 
 struct file_system_type toyfs = {
@@ -196,15 +184,6 @@ struct file_system_type toyfs = {
 	.mount = toyfs_mount,
 	.kill_sb = toyfs_kill_superblock,
 };
-
-static int toyfs_proc_show(struct seq_file *m, void *v) {
-  seq_printf(m, "Hello from toyfs+proc!\n");
-  return 0;
-}
-
-static int toyfs_proc_open(struct inode *inode, struct  file *file) {
-  return single_open(file, toyfs_proc_show, NULL);
-}
 
 static const struct file_operations toyfs_proc_fops = {
   .owner = THIS_MODULE,
@@ -219,25 +198,23 @@ Register / Unregister
 =========================================================
 - toyfs_init
 - toyfs_cleanup
+- remove_proc_entry
+	- Testing the procfs communication. 
 ========================================================*/
 
 static int toyfs_init(void) {
-	printk(KERN_INFO "Registering File System | Loading Module\n"); 
+	printk(KERN_INFO "||Registering File System  ||\n\n"); 
 	printk(KERN_INFO "Userspace Process:'%s'\n", current->comm); 
 	printk(KERN_INFO "Userspace PID:'%d'\n", current->pid); 
 
-	// Create a procfs file for communication
-	proc_create("toyfs_proc", 0666, NULL, &toyfs_proc_fops);
-
-
+	proc_create("toyfs_proc", 0666, NULL, &toyfs_proc_fops);		// Create a procfs file for communication
 	return register_filesystem(&toyfs);
 }
 
 static void toyfs_cleanup(void) {
- 	printk(KERN_INFO "Unregistering File System | Unloading Module\n");
- 	// Remove the procfs file
- 	remove_proc_entry("toyfs_proc", NULL);
-
+ 	printk(KERN_INFO "\n||Unregistering File System||\n");
+	
+ 	remove_proc_entry("toyfs_proc", NULL);					// Remove the procfs file
  	unregister_filesystem(&toyfs);
 }
 
