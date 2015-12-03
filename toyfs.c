@@ -203,7 +203,7 @@ Register / Unregister
 static int toyfs_init(void) {
 	printk(KERN_INFO "Registering File System | Loading Module\n"); 
 	printk(KERN_INFO "Userspace Process:'%s'\n", current->comm); 
-	printk(KERN_INFO "Userspace PID:'%s'\n", current->pid); 
+	printk(KERN_INFO "Userspace PID:'%d'\n", current->pid); 
 	return register_filesystem(&toyfs);
 }
 
