@@ -132,7 +132,7 @@ Super Block
 static int toyfs_fill_superblock(struct super_block *sb, void *data, int silent)
 {
 	struct inode *inode = NULL;
-	printk(KERN_INFO "toyfs_fill_superblock\n");
+	printk(KERN_INFO "Initializing: toyfs_fill_superblock\n");
 	
 
 	//identifer for the filesystem type
