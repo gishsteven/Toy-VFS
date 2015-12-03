@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
 	error = write(file_d, (char *)&sb, sizeof(sb));
 
 	if(error != 4096)
-		printf("bytes written [&d] are not equal to the default block size", 			(int)error);
+		printf("bytes written [%d] are not equal to the default block size\n",(int)error);
 	else
 		printf("Super block written successfully");
 
