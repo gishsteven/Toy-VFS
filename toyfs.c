@@ -22,19 +22,20 @@ MODULE_AUTHOR("Nathan Sanders");
 MODULE_DESCRIPTION("Toy File System");
 
 /*=======================================================
-File Operations (Non-Functional)
+File Operations
 =========================================================
+*defined in fs.h:1507
 - file_operations (Data structure for file operations)
 	- .readdr
 - toyfs_read
-	- 
+- toyfs_write
 =========================================================*/
 
-/*
-Doesn't work. 
 
-static int toyfs_read(struct file *file, char *buf, int len, int *offset)
+ssize_t toyfs_read(struct file *file, char __user *buf, size_t len, loff_t *offset)
 {
+	printk(KERN_INFO "toyfs_read (Not functional)\n");
+/*
     char *buffer[100];
     int length = 3;
     buffer[0] = (char)file->private_data;
@@ -49,22 +50,21 @@ static int toyfs_read(struct file *file, char *buf, int len, int *offset)
             return -1;
     *offset += len;
     return len;
-
+*/
+	return 1;
 }
-*/
 
+ssize_t toyfs_write(struct file *file, const char __user *buf, size_t len, loff_t *offset)
+{
+	printk(KERN_INFO "toyfs_write (Not functional)\n");
+	return 1;
+}
 
-/*
-const struct file_operations toyfs_directory_operations = {
-	.owner = THIS_MODULE,
-	//.readdir = toyfs_read_directory,
-};
-*/
-/*
 const struct file_operations toyfs_file_operations = {
-    .read = toyfs_read,
+	.read  = toyfs_read,
+	.write = toyfs_write,
 };
-*/
+
 
 
 /*=======================================================
@@ -78,12 +78,14 @@ Inode Operations
 =========================================================*/
 struct dentry *toyfs_lookup(struct inode *parent, struct dentry *child, unsigned int flags)
 {
+	printk(KERN_INFO "toyfs_lookup (Not Functional)\n");
 	//In Progress
 	return NULL;
 }
 
 static int toyfs_create(struct inode *dir, struct dentry *dentry, umode_t mode, bool boo)
 {	
+	printk(KERN_INFO "toyfs_create (Not functional)\n");
 	//In Progress
 	return 1;
 }
