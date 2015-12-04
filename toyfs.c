@@ -74,13 +74,23 @@ Inode Operations
 	- Function should return an inode.
 - inode_operations
 	- .lookup
+	- .create
 =========================================================*/
-struct dentry *toyfs_lookup(struct inode *parent, struct dentry *child, unsigned int flags){
+struct dentry *toyfs_lookup(struct inode *parent, struct dentry *child, unsigned int flags)
+{
+	//In Progress
 	return NULL;
 }
 
-static struct inode_operations toyfs_inode_ops = {				//inode_operations data struct defined in fs.h
+static int toyfs_create(struct inode *dir, struct dentry *dentry, umode_t mode, bool boo)
+{	
+	//In Progress
+	return 1;
+}
+
+static struct inode_operations toyfs_inode_ops = {				//Defined in fs.h:1541
 	.lookup = toyfs_lookup,
+	.create = toyfs_create,
 };
 
 struct inode *toyfs_get_inode(struct super_block *sb, const struct inode *directory, umode_t mode, dev_t dev)
