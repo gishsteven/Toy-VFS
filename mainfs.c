@@ -7,6 +7,7 @@
 
 int main(int argc, char *argv[])
 {
+	printf("Running Main File: mainfs.c\n");
 	int file_d;
 	int error;
 	struct toyfs_super_block sb;
