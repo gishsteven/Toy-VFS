@@ -1,5 +1,4 @@
 #!/bin/bash
-TIME=2
 FS_TYPE="toyfs"
 MODULE_FILE="toyfs_mod.ko"
 MODULE_NAME="toyfs_mod"
@@ -23,7 +22,7 @@ insmod $MODULE_FILE
 
 # Check filesystem registration
 if cat /proc/filesystems | grep $FS_TYPE ; then
-	echo "* Filesystem is registered in /proc/filesystems"
+	echo "Filesystem is registered in /proc/filesystems"
 else
 	echo "Warning: Filesystem not registered in /proc/filesystems "
 fi
@@ -31,3 +30,12 @@ fi
 # Mount disk image to directory
 mkdir -p $MOUNT_DIR
 mount -o loop -t $FS_TYPE $DISK_FILEPATH $MOUNT_DIR
+
+# Display info about ProcFS file
+echo "Creating file /proc/toyfs_proc for kernel-user communication.."
+echo "ls -lh /proc/toyfs_proc: `ls -lh /proc/toyfs_proc`"
+echo "cat /proc/toyfs_proc: `cat /proc/toyfs_proc`"
+
+# Display dmesg logs
+echo "Displaying dmesg logs to verify filesystem integration"
+dmesg | tail -50

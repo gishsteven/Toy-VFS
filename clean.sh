@@ -7,7 +7,7 @@ MOUNT_DIR="/mnt/$FS_TYPE"
 
 # Initialization must be run as root user
 if [[ $EUID -ne 0 ]]; then
-   echo "Usage: sudo ./init.sh" 1>&2
+   echo "Usage: sudo ./clean.sh" 1>&2
    exit 1
 fi
 
@@ -22,3 +22,7 @@ make clean
 
 # Remove Disk
 rm $DISK_FILEPATH
+
+# Display dmesg logs
+
+dmesg | tail -50
